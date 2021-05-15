@@ -7,7 +7,7 @@ router.get('/api/auth/me', (req: Request, res: Response) => {
   res.status(200).send({
     user: {
       name: 'rickychao',
-      email: 'lusifar0910@gmail.com',
+      email: 'rickychao@testbed.com',
     },
   });
 });
