@@ -1,0 +1,27 @@
+{
+  "name": "testbed_nats_streaming",
+  "version": "1.0.0",
+  "description": "the testbed for testing the features of nats streaming server",
+  "main": "index.js",
+  "scripts": {
+    "publisher": "nodemon src/test-publisher.ts",
+    "listener": "nodemon src/test-listener.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "nodejs",
+    "nats",
+    "streaming",
+    "server"
+  ],
+  "author": "rickychao",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^15.3.0",
+    "nodemon": "^2.0.7",
+    "ts-node": "^9.1.1"
+  },
+  "dependencies": {
+    "node-nats-streaming": "^0.3.2"
+  }
+}
