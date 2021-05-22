@@ -1,0 +1,15 @@
+{
+  "name": "testbed_grpc",
+  "version": "1.0.0",
+  "description": "the testbed for testing the features of grpc",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "nodejs",
+    "grpc"
+  ],
+  "author": "rickychao",
+  "license": "ISC"
+}
