@@ -11,5 +11,8 @@
     "grpc"
   ],
   "author": "rickychao",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "google-protobuf": "^3.17.0"
+  }
 }
