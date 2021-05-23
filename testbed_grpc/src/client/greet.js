@@ -3,9 +3,7 @@ const grpc = require("grpc");
 const proto = require("../../build/src/proto/greet_pb");
 const service = require("../../build/src/proto/greet_grpc_pb");
 
-const main = () => {
-  console.log("Hello from client");
-
+const callGreet = () => {
   const client = new service.GreetServiceClient(
     "localhost:50051",
     grpc.credentials.createInsecure()
@@ -28,6 +26,10 @@ const main = () => {
       console.error(err);
     }
   });
+}
+
+const main = () => {
+  callGreet();
 };
 
 main();
