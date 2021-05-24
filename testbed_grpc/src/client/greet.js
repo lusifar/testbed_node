@@ -97,10 +97,73 @@ const callLongGreet = () => {
   call.end();
 };
 
+/*
+  sleep function to sleep for some interval
+*/
+const sleep = async (interval) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve();
+    }, interval);
+  });
+};
+
+/*
+    call the greetEveryone RPC method
+*/
+const callGreetEveryone = async () => {
+  const client = new service.GreetServiceClient(
+    "localhost:50051",
+    grpc.credentials.createInsecure()
+  );
+
+  const greeting = new proto.Greeting();
+  greeting.setFirstName("ricky");
+  greeting.setLastName("chao");
+
+  const req = new proto.GreetEveryoneRequest();
+  req.setGreeting(greeting);
+
+  const call = client.greetEveryone(req, (err, res) => {
+    if (!err) {
+      console.log(res.getResult());
+    } else {
+      console.error(err);
+    }
+  });
+
+  // receive stream data from server
+  call.on("data", (res) => {
+    console.log(res.getResult());
+  });
+
+  call.on("status", (res) => {
+    console.log(`the status is ${res.details}`);
+  });
+
+  call.on("error", (err) => {
+    console.error(`the error is ${err.details}`);
+  });
+
+  call.on("end", () => {
+    console.log("streaming is over");
+  });
+
+  // send stream data to server
+  let count = 0;
+  while (++count < 30) {
+    call.write(req);
+
+    await sleep(1500);
+  }
+  call.end();
+};
+
 const main = () => {
   // callGreet();
   // callGreetMany();
-  callLongGreet();
+  // callLongGreet();
+  callGreetEveryone();
 };
 
 main();
