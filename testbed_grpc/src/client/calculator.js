@@ -90,10 +90,58 @@ callComputeAverage = () => {
   call.end();
 };
 
+/*
+    Sleep method
+*/
+const sleep = async (interval) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => resolve(), interval);
+  });
+};
+
+/*
+    Call findMaximum RPC method
+*/
+const callFindMaximum = async () => {
+  const client = new service.CalculatorServiceClient(
+    "localhost:50051",
+    grpc.credentials.createInsecure()
+  );
+
+  const call = client.findMaximum(null, (err, res) => {});
+
+  call.on("data", (res) => {
+    console.log(`Got new max from server => ${res.getMaximum()}`);
+  });
+
+  call.on("error", (err) => {
+    console.error(err);
+  });
+
+  call.on("end", () => {
+    console.log("Server has completed sending data");
+  });
+
+  // send stream data to the server
+  const numbers = [3, 5, 17, 9, 8, 30, 12];
+  for (let number of numbers) {
+    console.log(`Sending number: ${number}`);
+
+    const req = new proto.FindMaximumRequest();
+    req.setNumber(number);
+
+    call.write(req);
+
+    await sleep(1000);
+  }
+  call.end();
+};
+
 const main = () => {
   // callSum();
   // callPrimeNumberDecomposition();
-  callComputeAverage();
+  // callComputeAverage();
+  callFindMaximum();
 };
 
 main();

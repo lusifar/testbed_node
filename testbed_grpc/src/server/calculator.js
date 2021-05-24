@@ -49,14 +49,14 @@ const computeAverage = (call, callback) => {
   call.on("data", (req) => {
     const number = req.getNumber();
 
-    console.log(`receive number ${number}`);
+    console.log(`Receive number ${number}`);
 
     total += number;
     count += 1;
   });
 
   call.on("status", (status) => {
-    console.log(`the status is ${status.details}`);
+    console.log(`The status is ${status.details}`);
   });
 
   call.on("error", (err) => {
@@ -73,12 +73,50 @@ const computeAverage = (call, callback) => {
   });
 };
 
+/*
+    Implement the findMaximun RPC method
+*/
+const findMaximum = async (call, callback) => {
+  let currentMaximum = 0;
+  let currentNumber = 0;
+
+  // receive the stream data from client
+  call.on("data", (req) => {
+    currentNumber = req.getNumber();
+    console.log(`Streaming data is ${currentNumber}`);
+
+    if (currentNumber > currentMaximum) {
+      currentMaximum = currentNumber;
+
+      const res = new proto.FindMaximumResponse();
+      res.setMaximum(currentMaximum);
+
+      call.write(res);
+    }
+  });
+
+  call.on("error", (err) => {
+    console.log(err);
+  });
+
+  call.on("end", () => {
+    const res = new proto.FindMaximumResponse();
+    res.setMaximum(currentMaximum);
+
+    call.write(res);
+    call.end();
+
+    console.log("Streaming data from client is end");
+  });
+};
+
 const main = () => {
   const server = new grpc.Server();
   server.addService(service.CalculatorServiceService, {
     sum,
     primeNumberDecomposition,
     computeAverage,
+    findMaximum,
   });
 
   server.bind("localhost:50051", grpc.ServerCredentials.createInsecure());
