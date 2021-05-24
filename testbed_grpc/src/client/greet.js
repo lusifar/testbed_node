@@ -53,8 +53,8 @@ const callGreetMany = () => {
     console.log(res.getResult());
   });
 
-  call.on("status", (res) => {
-    console.log(`the status is ${res.details}`);
+  call.on("status", (status) => {
+    console.log(`the status is ${status.details}`);
   });
 
   call.on("error", (err) => {
@@ -137,8 +137,8 @@ const callGreetEveryone = async () => {
     console.log(res.getResult());
   });
 
-  call.on("status", (res) => {
-    console.log(`the status is ${res.details}`);
+  call.on("status", (status) => {
+    console.log(`the status is ${status.details}`);
   });
 
   call.on("error", (err) => {
