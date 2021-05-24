@@ -48,6 +48,28 @@ function deserialize_greet_GreetResponse(buffer_arg) {
   return src_proto_greet_pb.GreetResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_greet_LongGreetRequest(arg) {
+  if (!(arg instanceof src_proto_greet_pb.LongGreetRequest)) {
+    throw new Error('Expected argument of type greet.LongGreetRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_greet_LongGreetRequest(buffer_arg) {
+  return src_proto_greet_pb.LongGreetRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_greet_LongGreetResponse(arg) {
+  if (!(arg instanceof src_proto_greet_pb.LongGreetResponse)) {
+    throw new Error('Expected argument of type greet.LongGreetResponse');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_greet_LongGreetResponse(buffer_arg) {
+  return src_proto_greet_pb.LongGreetResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 
 var GreetServiceService = exports.GreetServiceService = {
   // unary api
@@ -73,6 +95,18 @@ greetMany: {
     requestDeserialize: deserialize_greet_GreetManyRequest,
     responseSerialize: serialize_greet_GreetManyResponse,
     responseDeserialize: deserialize_greet_GreetManyResponse,
+  },
+  // client stream api
+longGreet: {
+    path: '/greet.GreetService/LongGreet',
+    requestStream: true,
+    responseStream: false,
+    requestType: src_proto_greet_pb.LongGreetRequest,
+    responseType: src_proto_greet_pb.LongGreetResponse,
+    requestSerialize: serialize_greet_LongGreetRequest,
+    requestDeserialize: deserialize_greet_LongGreetRequest,
+    responseSerialize: serialize_greet_LongGreetResponse,
+    responseDeserialize: deserialize_greet_LongGreetResponse,
   },
 };
 

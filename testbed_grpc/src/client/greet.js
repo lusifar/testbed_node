@@ -58,7 +58,7 @@ const callGreetMany = () => {
   });
 
   call.on("error", (err) => {
-    console.log(`the error is ${err.details}`);
+    console.error(`the error is ${err.details}`);
   });
 
   call.on("end", () => {
@@ -66,9 +66,41 @@ const callGreetMany = () => {
   });
 };
 
+/*
+  Call the longGreet RPC method
+*/
+const callLongGreet = () => {
+  const client = new service.GreetServiceClient(
+    "localhost:50051",
+    grpc.credentials.createInsecure()
+  );
+
+  const greeting = new proto.Greeting();
+  greeting.setFirstName("ricky");
+  greeting.setLastName("chao");
+
+  const req = new proto.LongGreetRequest();
+  req.setGreeting(greeting);
+
+  const call = client.longGreet(req, (err, res) => {
+    if (!err) {
+      console.log(res.getResult());
+    } else {
+      console.error(err);
+    }
+  });
+
+  let count = 0;
+  while (++count < 10) {
+    call.write(req);
+  }
+  call.end();
+};
+
 const main = () => {
   // callGreet();
-  callGreetMany();
+  // callGreetMany();
+  callLongGreet();
 };
 
 main();

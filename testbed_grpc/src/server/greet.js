@@ -39,9 +39,40 @@ const greetMany = (call, callback) => {
   call.end();
 };
 
+/*
+  Implement the longGreet RPC method
+*/
+const longGreet = (call, callback) => {
+  call.on("data", (res) => {
+    const greeting = res.getGreeting();
+    const text = `${greeting.getFirstName()} ${greeting.getLastName()}`;
+
+    console.log(text);
+  });
+
+  call.on("status", (status) => {
+    console.log(`the status is ${status.details}`);
+  });
+
+  call.on("error", (err) => {
+    console.error(`the error is ${err}`);
+  });
+
+  call.on("end", () => {
+    const res = new proto.LongGreetResponse();
+    res.setResult("streaming is over");
+
+    callback(null, res);
+  });
+};
+
 const main = () => {
   const server = new grpc.Server();
-  server.addService(service.GreetServiceService, { greet, greetMany });
+  server.addService(service.GreetServiceService, {
+    greet,
+    greetMany,
+    longGreet,
+  });
 
   server.bind("localhost:50051", grpc.ServerCredentials.createInsecure());
   server.start();
