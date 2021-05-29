@@ -1,0 +1,1 @@
+../../node_modules/.bin/knex migrate:make ${1}
