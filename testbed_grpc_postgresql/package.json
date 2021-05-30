@@ -1,0 +1,25 @@
+{
+  "name": "testbed_grpc_postgress",
+  "version": "1.0.0",
+  "description": "the testbed for testing the features of grpc with crud in postgress",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "nodejs",
+    "grpc",
+    "postgress"
+  ],
+  "author": "rickychao",
+  "license": "ISC",
+  "dependencies": {
+    "@nanhuazhang/grpc-interceptors": "^1.0.2",
+    "dotenv": "^10.0.0",
+    "google-protobuf": "^3.17.1",
+    "grpc": "^1.24.10",
+    "jsonwebtoken": "^8.5.1",
+    "knex": "^0.95.6",
+    "pg": "^8.6.0"
+  }
+}
