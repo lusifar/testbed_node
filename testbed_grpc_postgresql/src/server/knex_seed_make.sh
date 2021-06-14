@@ -1,1 +1,0 @@
-../../node_modules/.bin/knex seed:make ${1}
