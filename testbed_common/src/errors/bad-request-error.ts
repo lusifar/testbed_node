@@ -5,7 +5,7 @@ export class BadRequest extends CustomError {
   reason: string = '';
 
   constructor(reason: string) {
-    super('Error: Bad request');
+    super('[Error] Bad request');
 
     Object.setPrototypeOf(this, BadRequest.prototype);
 
