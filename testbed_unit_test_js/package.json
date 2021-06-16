@@ -1,0 +1,28 @@
+{
+  "name": "testbed_unit_test_js",
+  "version": "1.0.0",
+  "description": "the testbed for testing the unit-test in javascript",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --watchAll --no-cache"
+  },
+  "keywords": [
+    "nodejs",
+    "jest",
+    "unit-test"
+  ],
+  "author": "rickychao",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^27.0.4"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "setupFilesAfterEnv": [
+      "./src/test/setup.js"
+    ]
+  },
+  "dependencies": {
+    "dotenv": "^10.0.0"
+  }
+}
