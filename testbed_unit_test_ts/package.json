@@ -1,0 +1,31 @@
+{
+  "name": "testbed_unit_test_ts",
+  "version": "1.0.0",
+  "description": "the testbed for testing the unit-test of typescript",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node ./src/index.ts",
+    "test": "jest --watchAll --no-cache"
+  },
+  "keywords": [
+    "nodejs",
+    "jest",
+    "unit-test"
+  ],
+  "author": "rickychao",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jest": "^26.0.23",
+    "jest": "^27.0.4",
+    "ts-jest": "^27.0.3",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.3.3"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "setupFilesAfterEnv": [
+      "./src/test/setup.ts"
+    ]
+  }
+}
