@@ -65,4 +65,16 @@ describe('signupRouter', () => {
       })
       .expect(400);
   });
+
+  it('set a cookie after successful signup', async () => {
+    const res = await request(app)
+      .post('/api/users/signup')
+      .send({
+        email: 'test@test.com',
+        password: 'password',
+      })
+      .expect(201);
+
+    expect(res.get('Set-Cookie')).toBeDefined();
+  });
 });

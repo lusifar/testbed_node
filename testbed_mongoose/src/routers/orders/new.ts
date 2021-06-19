@@ -3,13 +3,18 @@ import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
 
 import { validateRequest } from '../../middlewares/validate-request';
+import { currentUser } from '../../middlewares/current-user';
 
 import { Ticket } from '../../models/ticket';
+import { Order, OrderStatus } from '../../models/order';
+
+const EXPIRATION_WINDOW_SECONDS = 15 * 60;
 
 const router = express.Router();
 
 router.post(
   '/api/orders',
+  currentUser,
   [body('ticketId').not().isEmpty().isMongoId().withMessage('TicketId must be provided')],
   validateRequest,
   async (req: Request, res: Response) => {
@@ -22,12 +27,25 @@ router.post(
     }
 
     // make sure that this ticket is not already reserved
-    const isReserved = ticket.isReserved();
+    const isReserved = await ticket.isReserved();
     if (isReserved) {
       throw new Error('Ticket is already reservde');
     }
 
-    res.send({});
+    // calculate an expiration date for this order
+    const expiration = new Date();
+    expiration.setSeconds(expiration.getSeconds() + EXPIRATION_WINDOW_SECONDS);
+
+    // build the order and save it to the database
+    const order = Order.build({
+      userId: req.currentUser!.id,
+      status: OrderStatus.Created,
+      expiresAt: expiration,
+      ticket,
+    });
+    await order.save();
+
+    res.status(201).send(order);
   }
 );
 
