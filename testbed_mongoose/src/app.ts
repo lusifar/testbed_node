@@ -9,6 +9,7 @@ import cookieSession from 'cookie-session';
 import { errorHandler } from './middlewares/error-handler';
 
 import { signupRouter } from './routers/users/signup';
+import { signinRouter } from './routers/users/signin';
 import { newOrderRouter } from './routers/orders/new';
 
 const app = express();
@@ -22,6 +23,7 @@ app.use(
 );
 
 app.use(signupRouter);
+app.use(signinRouter);
 app.use(newOrderRouter);
 app.use(errorHandler);
 
