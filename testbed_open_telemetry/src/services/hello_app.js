@@ -7,6 +7,7 @@ const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 
 const { registerInstrumentations } = require('@opentelemetry/instrumentation');
 const { HttpInstrumentation } = require('@opentelemetry/instrumentation-http');
+const { ExpressInstrumentation } = require('@opentelemetry/instrumentation-express');
 const { WinstonInstrumentation } = require('@opentelemetry/instrumentation-winston');
 
 // setup the OpenTelemetry for console and jaeger
@@ -42,6 +43,7 @@ provider.register();
 registerInstrumentations({
   instrumentations: [
     new HttpInstrumentation(),
+    new ExpressInstrumentation(),
     new WinstonInstrumentation({
       logHook: (record, span) => {
         record['resource.service.name'] = provider.resource.attributes['service.name'];
