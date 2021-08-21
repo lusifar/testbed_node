@@ -1,0 +1,30 @@
+{
+  "name": "testbed_open_telemetry",
+  "version": "1.0.0",
+  "description": "the testbed for tesing the features of open telemetry client in nodejs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "nodejs",
+    "OpenTelemetry"
+  ],
+  "author": "rickychao",
+  "license": "ISC",
+  "dependencies": {
+    "@opentelemetry/api": "^1.0.1",
+    "@opentelemetry/core": "^0.23.0",
+    "@opentelemetry/exporter-jaeger": "^0.23.0",
+    "@opentelemetry/instrumentation": "^0.23.0",
+    "@opentelemetry/instrumentation-express": "^0.23.0",
+    "@opentelemetry/instrumentation-http": "^0.23.0",
+    "@opentelemetry/instrumentation-winston": "^0.23.0",
+    "@opentelemetry/node": "^0.23.0",
+    "@opentelemetry/semantic-conventions": "^0.23.0",
+    "@opentelemetry/tracing": "^0.23.0",
+    "axios": "^0.21.1",
+    "express": "^4.17.1",
+    "winston": "^3.3.3"
+  }
+}

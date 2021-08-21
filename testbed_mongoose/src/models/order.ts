@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { updateIfCurrentPlugin } from 'mongoose-update-if-current'; // step1: add this plugin for change the __v version key
 import { TicketDoc } from '../models/ticket';
 
 export enum OrderStatus {
@@ -20,6 +21,7 @@ interface OrderDoc extends mongoose.Document {
   status: OrderStatus;
   expiresAt: Date;
   ticket: TicketDoc;
+  version: number; // step3: need to add this property if __v is changed to version
 }
 
 interface OrderModel extends mongoose.Model<OrderDoc> {
@@ -55,6 +57,10 @@ const orderSchema = new mongoose.Schema(
     },
   }
 );
+
+// step2: change the version key from __v to version
+orderSchema.set('versionKey', 'version');
+orderSchema.plugin(updateIfCurrentPlugin);
 
 orderSchema.statics.build = (attrs: OrderAttrs) => {
   return new Order(attrs);
