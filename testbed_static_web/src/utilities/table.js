@@ -50,7 +50,7 @@ const genTBody = (bodies, styleObject) => {
 const genTable = (headers, bodies, styleObject) => {
   const tableStyle = styleToCss(styleObject.table);
 
-  return `<table width="100%" style="${tableStyle}">${genTHeader(headers, styleObject.thead)}${genTBody(
+  return `<table width="80%" style="${tableStyle}">${genTHeader(headers, styleObject.thead)}${genTBody(
     bodies,
     styleObject.tbody
   )}</table>`;
