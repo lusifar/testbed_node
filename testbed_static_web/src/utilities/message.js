@@ -3,7 +3,7 @@ const styleToCss = require('style-object-to-css-string');
 const genMessage = (text, primaryColor, secondColor) => {
   const styleObject = {
     display: 'inline-block',
-    padding: '10px 20px',
+    padding: '5px 10px',
     color: `${primaryColor}`,
     backgroundColor: `${secondColor}`,
     border: `1px solid ${primaryColor}`,
@@ -17,11 +17,11 @@ const genMessage = (text, primaryColor, secondColor) => {
 };
 
 const genInfoMessage = (text) => {
-  return genMessage(text, '#00cc00', '#ccffcc');
+  return genMessage(`&#128276; ${text}`, '#00cc00', '#ccffcc');
 };
 
 const genErrorMessage = (text) => {
-  return genMessage(text, '#cc3300', '#ffb399');
+  return genMessage(`&#9940; ${text}`, '#cc3300', '#ffb399');
 };
 
 module.exports = {
