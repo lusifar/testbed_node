@@ -88,15 +88,31 @@ const express = require('express');
 
 // console.log(genTable(headers, bodies, styleObject));
 
-const { genInfoMessage, genErrorMessage } = require('./utilities/message');
+// const { genInfoMessage, genErrorMessage } = require('./utilities/message');
 
-console.log(genInfoMessage('DMON_PA(AMEAE4, #4) is on 前量'));
+// console.log(genInfoMessage('DMON_PA(AMEAE4, #4) is on 前量'));
 
-console.log(genErrorMessage('PA SPC Packing is Faulted'));
+// console.log(genErrorMessage('PA SPC Packing is Faulted'));
+
+const { genButtonList } = require('./utilities/button');
+
+const textList = ['&#127538; (AMEAE4,#4)', '&#127538; (AMEAE4,#4)', '&#127538; (AMEAE4,#4)'];
+const hrefList = [
+  'http://localhost:3030/api/button/click?command=workflow&subcommand=dailyDefectMaintain&toolId=AMEAE4&chamberId=#4',
+  'http://localhost:3030/api/button/click?command=workflow&subcommand=dailyDefectMaintain&toolId=AMEAE4&chamberId=#4',
+  'http://localhost:3030/api/button/click?command=workflow&subcommand=dailyDefectMaintain&toolId=AMEAE4&chamberId=#4',
+];
+
+console.log(genButtonList('rgb(45, 91, 185)', 'rgb(194, 209, 240)', textList, hrefList));
 
 const app = express();
 
 app.use(express.static('public'));
+
+app.get('/api/button/click', async (req, res) => {
+  const query = req.query;
+  console.log(query);
+});
 
 app.listen(3030, () => {
   console.log('express lives on 3030');
