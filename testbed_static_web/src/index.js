@@ -94,16 +94,41 @@ const express = require('express');
 
 // console.log(genErrorMessage('PA SPC Packing is Faulted'));
 
-const { genButtonList } = require('./utilities/button');
+// const { buttonList } = require('./utilities/button');
 
-const textList = ['&#127538; (AMEAE4,#4)', '&#127538; (AMEAE4,#4)', '&#127538; (AMEAE4,#4)'];
-const hrefList = [
-  'http://localhost:3030/api/button/click?command=workflow&subcommand=dailyDefectMaintain&toolId=AMEAE4&chamberId=#4',
-  'http://localhost:3030/api/button/click?command=workflow&subcommand=dailyDefectMaintain&toolId=AMEAE4&chamberId=#4',
-  'http://localhost:3030/api/button/click?command=workflow&subcommand=dailyDefectMaintain&toolId=AMEAE4&chamberId=#4',
+// const textList = ['&#128076; (AMEAE4,#4)', '&#127538; (AMEAE4,#4)', '&#127538; (AMEAE4,#4)'];
+// const hrefList = [
+//   'http://localhost:3030/api/button/click?command=workflow&subcommand=dailyDefectMaintain&toolId=AMEAE4&chamberId=#4',
+//   'http://localhost:3030/api/button/click?command=workflow&subcommand=dailyDefectMaintain&toolId=AMEAE4&chamberId=#4',
+//   'http://localhost:3030/api/button/click?command=workflow&subcommand=dailyDefectMaintain&toolId=AMEAE4&chamberId=#4',
+// ];
+// const primaryColorList = ['rgb(179, 179, 179)', 'rgb(45, 91, 185)', 'rgb(45, 91, 185)'];
+// const secondColorList = ['rgb(230, 230, 230)', 'rgb(194, 209, 240)', 'rgb(194, 209, 240)'];
+// const disableList = [true, false, false];
+
+// console.log(buttonList(textList, hrefList, primaryColorList, secondColorList, disableList));
+
+const { systemWCH } = require('./utilities/bot');
+
+const wchList = [
+  {
+    toolId: 'AMEAE4',
+    chamberId: '1',
+    disable: true,
+  },
+  {
+    toolId: 'AMEAE4',
+    chamberId: '2',
+    disable: false,
+  },
+  {
+    toolId: 'AMEAE4',
+    chamberId: '3',
+    disable: false,
+  },
 ];
 
-console.log(genButtonList('rgb(45, 91, 185)', 'rgb(194, 209, 240)', textList, hrefList));
+console.log(systemWCH('Daily Worse Chambers', wchList));
 
 const app = express();
 

@@ -3,12 +3,10 @@ const styleToCss = require('style-object-to-css-string');
 const genMessage = (text, primaryColor, secondColor) => {
   const styleObject = {
     display: 'inline-block',
-    padding: '5px 10px',
+    padding: '10px 10px',
     color: `${primaryColor}`,
     backgroundColor: `${secondColor}`,
-    border: `1px solid ${primaryColor}`,
     borderRadius: '8px',
-    boxShadow: `0px 5px 0px ${primaryColor}, inset 0px 1px 0px white, inset 0px -1px 0px white, inset 1px 0px 0px white, inset -1px 0px 0px white, 0px 5px 5px gray`,
   };
 
   const style = styleToCss(styleObject);
@@ -24,7 +22,12 @@ const genErrorMessage = (text) => {
   return genMessage(`&#9940; ${text}`, '#cc3300', '#ffb399');
 };
 
+const systemCRONJobText = (text) => {
+  return genMessage(`&#128338; ${text}`, 'rgb(115, 115, 115)', 'rgb(242, 242, 242)');
+};
+
 module.exports = {
   genInfoMessage,
   genErrorMessage,
+  systemCRONJobText,
 };
