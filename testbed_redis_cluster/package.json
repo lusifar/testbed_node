@@ -1,0 +1,17 @@
+{
+  "name": "testbed_redis_cluster",
+  "version": "1.0.0",
+  "description": "the testbed for testing the manipulation of redis cluster",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "rickychao",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1"
+  }
+}
