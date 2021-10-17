@@ -119,16 +119,16 @@ const wchList = [
   {
     toolId: 'AMEAE4',
     chamberId: '2',
-    disable: false,
+    disable: true,
   },
   {
     toolId: 'AMEAE4',
     chamberId: '3',
-    disable: false,
+    disable: true,
   },
 ];
 
-console.log(systemWCH('Daily Worse Chambers', wchList));
+console.log(systemWCH('Daily Worse Chambers Done', wchList));
 
 const app = express();
 

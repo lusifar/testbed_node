@@ -1,0 +1,19 @@
+{
+  "name": "testbed_soketio",
+  "version": "1.0.0",
+  "description": "the testbed for testing socket.io",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "nodejs",
+    "soketio"
+  ],
+  "author": "rickychao",
+  "license": "ISC",
+  "dependencies": {
+    "socket.io": "^4.3.0",
+    "socket.io-client": "^4.3.0"
+  }
+}
