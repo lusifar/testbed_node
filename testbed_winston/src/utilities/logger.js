@@ -36,23 +36,27 @@ logger.begin = (message, metadata) => {
   return handle;
 };
 
-logger.end = (handle) => {
+const getDelHandleData = (handle) => {
   const cacheData = logger.cache.get(handle);
   if (cacheData === undefined) {
-    return;
+    return null;
   }
   logger.cache.del(handle);
+
+  return cacheData;
+};
+
+logger.end = (handle) => {
+  const cacheData = getDelHandleData(handle);
+  if (!cacheData) return;
 
   const duration = moment().diff(cacheData.ts);
   logger.info('', { loggerState: 'end', duration, ...cacheData.metadata });
 };
 
 logger.err = (handle) => {
-  const cacheData = logger.cache.get(handle);
-  if (cacheData === undefined) {
-    return;
-  }
-  logger.cache.del(handle);
+  const cacheData = getDelHandleData(handle);
+  if (!cacheData) return;
 
   const duration = moment().diff(cacheData.ts);
   logger.error('', { loggerState: 'err', duration, ...cacheData.metadata });
