@@ -1,0 +1,21 @@
+{
+  "name": "testbed_winston",
+  "version": "1.0.0",
+  "description": "the testbed for testing the winston logger",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "nodejs",
+    "winston"
+  ],
+  "author": "rickychao",
+  "license": "ISC",
+  "dependencies": {
+    "moment": "^2.29.1",
+    "node-cache": "^5.1.2",
+    "uuid": "^8.3.2",
+    "winston": "^3.3.3"
+  }
+}
