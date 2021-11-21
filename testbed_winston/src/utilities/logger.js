@@ -24,18 +24,6 @@ const logger = createLogger({
 
 logger.cache = new NodeCache();
 
-logger.begin = (message, metadata) => {
-  const handle = uuidv4();
-  logger.cache.set(handle, {
-    ts: moment(),
-    metadata,
-  });
-
-  logger.info(message, { loggerState: 'begin', ...metadata });
-
-  return handle;
-};
-
 const getDelHandleData = (handle) => {
   const cacheData = logger.cache.get(handle);
   if (cacheData === undefined) {
@@ -46,20 +34,32 @@ const getDelHandleData = (handle) => {
   return cacheData;
 };
 
-logger.end = (handle) => {
-  const cacheData = getDelHandleData(handle);
-  if (!cacheData) return;
+logger.begin = (message, metadata) => {
+  const handle = uuidv4();
+  logger.cache.set(handle, {
+    ts: moment(),
+    metadata,
+  });
 
-  const duration = moment().diff(cacheData.ts);
-  logger.info('', { loggerState: 'end', duration, ...cacheData.metadata });
+  logger.info(message, { _type: 'begin', ...metadata });
+
+  return handle;
 };
 
-logger.err = (handle) => {
+logger.end = (handle, message = '') => {
   const cacheData = getDelHandleData(handle);
   if (!cacheData) return;
 
   const duration = moment().diff(cacheData.ts);
-  logger.error('', { loggerState: 'err', duration, ...cacheData.metadata });
+  logger.info(message, { _type: 'end', _duration: duration, ...cacheData.metadata });
+};
+
+logger.err = (handle, message = '') => {
+  const cacheData = getDelHandleData(handle);
+  if (!cacheData) return;
+
+  const duration = moment().diff(cacheData.ts);
+  logger.error(message, { _type: 'err', _duration: duration, ...cacheData.metadata });
 };
 
 module.exports = logger;

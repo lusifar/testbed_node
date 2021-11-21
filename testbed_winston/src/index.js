@@ -1,8 +1,8 @@
 const logger = require('./utilities/logger');
 
 const handle = logger.begin('begin the service', {
-  service: 'rpaUtil',
-  function: 'getPASPC',
+  class: 'rpaUtil',
+  method: 'getPASPC',
 });
 
 setTimeout(() => {
