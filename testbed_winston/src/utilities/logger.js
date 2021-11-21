@@ -5,7 +5,7 @@ const { createLogger, format, transports } = require('winston');
 const { timestamp, printf, combine, splat, label } = format;
 
 const customFormat = printf(({ timestamp, label, message, level, ...metadata }) => {
-  return `${timestamp} [${label}] (${level}) ${message} ${JSON.stringify(metadata)}`;
+  return `[${label}] ${timestamp} ${level} ${message} ${JSON.stringify(metadata)}`;
 });
 
 const logger = createLogger({
