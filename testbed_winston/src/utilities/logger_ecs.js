@@ -1,25 +1,22 @@
 const moment = require('moment');
 const uuidv4 = require('uuid').v4;
 const NodeCache = require('node-cache');
-const { createLogger, format, transports } = require('winston');
-const { timestamp, printf, combine, splat, label } = format;
-
-const customFormat = printf(({ timestamp, label, message, level, ...metadata }) => {
-  return `[${label}] ${timestamp} ${level} ${message} ${JSON.stringify(metadata)}`;
-});
+const { createLogger, transports } = require('winston');
+const ecsFormat = require('@elastic/ecs-winston-format');
+const { ElasticsearchTransport } = require('winston-elasticsearch');
 
 const logger = createLogger({
   level: 'debug',
-  format: combine(
-    timestamp(),
-    label({
-      label: 'DEFECT_FLOW',
-      message: false,
+  format: ecsFormat(),
+  transports: [
+    new transports.Console({ level: 'debug' }),
+    new ElasticsearchTransport({
+      level: 'debug',
+      clientOpts: {
+        node: 'http://localhost:9200',
+      },
     }),
-    splat(),
-    customFormat
-  ),
-  transports: [new transports.Console({ level: 'debug' })],
+  ],
 });
 
 logger.cache = new NodeCache();
@@ -54,12 +51,12 @@ logger.end = (handle, message = '') => {
   logger.info(message, { _status: 'end', _duration: duration, ...cacheData.metadata });
 };
 
-logger.fail = (handle, message = '') => {
+logger.fail = (handle, error, message = '') => {
   const cacheData = getDelHandleData(handle);
   if (!cacheData) return;
 
   const duration = moment().diff(cacheData.ts);
-  logger.error(message, { _status: 'fail', _duration: duration, ...cacheData.metadata });
+  logger.error(message, { err: error, _status: 'fail', _duration: duration, ...cacheData.metadata });
 };
 
 module.exports = logger;
