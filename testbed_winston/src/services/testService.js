@@ -1,31 +1,44 @@
-const logger = require('../utilities/logger_ecs');
+const logger = require('../utilities/logger');
 
 class TestService {
   constructor() {}
 
   process() {
     const handle = logger.begin({ module: 'TestService', method: 'process' }, 'begin processing...');
-    try {
+
+    return new Promise((resolve, reject) => {
       let count = 0;
 
-      const handle = setInterval(() => {
-        if (count === 100) {
-          clearInterval(handle);
+      const goal = Math.random() * 100;
+      const errGoal = Math.random() * 100;
+
+      console.log(goal, errGoal);
+
+      const intervalHandle = setInterval(() => {
+        if (count >= goal) {
+          logger.end(handle, 'end processing...');
+          clearInterval(intervalHandle);
         }
 
-        if (count % 17 === 0) {
-        } else {
-          logger.info(`the count value is: ${count}`, { module: 'TestService', method: 'process', count });
+        if (count >= errGoal) {
+          logger.fail(handle, 'Something wrong...');
+          clearInterval(intervalHandle);
+
+          reject(new Error('Something wrong...'));
         }
+
+        logger.info(`the count value is: ${count}`, {
+          module: 'TestService',
+          method: 'process',
+          value: Math.random() * 10,
+          count,
+        });
 
         count += 1;
       }, 1000);
 
-      //   throw new Error('403 Request Failed');
-    } catch (err) {
-      logger.error('something wrong', { err });
-    }
-    logger.end(handle, 'end processing...');
+      resolve();
+    });
   }
 }
 

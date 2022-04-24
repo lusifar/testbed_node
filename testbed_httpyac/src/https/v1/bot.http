@@ -1,0 +1,9 @@
+# @name postMessage
+# @import ./auth.http
+# @ref getAccessToken
+POST {{APP_HOST}}/api/v1/bot/messages HTTP/1.1
+X-API-TOKEN: {{getAccessToken.accessToken}}
+
+< ./bot.messages.post.payload.json
+
+ 

@@ -1,4 +1,4 @@
-const { connect, StringCodec, consumerOpts, createInbox } = require('nats');
+const { connect, StringCodec, consumerOpts, credsAuthenticator, AckPolicy } = require('nats');
 
 class NATSClient {
   constructor() {
@@ -7,15 +7,34 @@ class NATSClient {
     this.js = null;
     this.sc = StringCodec();
     this.subs = {};
+    this.handler = null;
   }
 
-  async connect(url, port) {
+  async connect(name, servers, creds = null, apiPrefix = null) {
     try {
-      this.nc = await connect({ servers: `${url}:${port}` });
-      this.jsm = await this.nc.jetstreamManager();
-      this.js = await this.nc.jetstream();
+      this.nc = await connect({
+        name,
+        servers,
+        ...(creds ? { authenticator: credsAuthenticator(new TextEncoder().encode(creds)) } : {}),
+      });
+
+      this.jsm = await this.nc.jetstreamManager({
+        ...(apiPrefix ? { apiPrefix } : {}),
+      });
+
+      this.js = await this.nc.jetstream({
+        ...(apiPrefix ? { apiPrefix } : {}),
+      });
+
+      this.handler = setInterval(() => {
+        for (let sub of Object.values(this.subs)) {
+          sub.pull({ batch: 10, expires: 10000 });
+        }
+      }, 10000);
+
+      console.log('Successfully connect to NATS');
     } catch (err) {
-      console.log(`[NATSClient connect err on ${err.message}]`);
+      console.error(`[NATSClient connect err on ${err.message}]`);
       throw err;
     }
   }
@@ -23,27 +42,36 @@ class NATSClient {
   async disconnect() {
     try {
       // unsubscribe the subscription
-      const keys = Object.keys(this.subs);
-      for (let key of keys) {
-        const [stream, subject] = key.split('.');
-        await this.unsubscribe(stream, subject);
+      if (this.subs) {
+        const subjects = Object.keys(this.subs);
+        for (let subject of subjects) {
+          await this.unsubscribe(subject);
+        }
+      }
+
+      // clear the interval with handler
+      if (this.handler) {
+        clearInterval(this.handler);
       }
 
       // close the connection
-      const done = this.nc.closed();
-      await this.nc.close();
+      if (this.nc) {
+        const done = this.nc.closed();
+        await this.nc.close();
 
-      const err = await done;
-      if (err) {
-        throw err;
+        const err = await done;
+        if (err) {
+          throw err;
+        }
       }
 
       this.nc = null;
       this.jsm = null;
       this.js = null;
       this.subs = {};
+      this.handler = null;
     } catch (err) {
-      console.log(`[NATSClient disconnect err on ${err.message}]`);
+      console.error(`[NATSClient disconnect err on ${err.message}]`);
       throw err;
     }
   }
@@ -55,18 +83,49 @@ class NATSClient {
     return true;
   }
 
-  async addStream(stream) {
+  async addStream(stream, subject) {
     try {
-      await this.jsm.streams.add({ name: stream, subjects: [`${stream}.*`] });
+      return this.jsm.streams.add({ name: stream, subjects: [subject] });
     } catch (err) {
       console.log(`[NATSClient addStream err on ${err.message}]`);
       throw err;
     }
   }
 
-  async publish(stream, subject, obj) {
+  async deleteStream(stream) {
     try {
-      const pa = await this.js.publish(`${stream}.${subject}`, this.sc.encode(JSON.stringify(obj)));
+      return this.jsm.streams.delete(stream);
+    } catch (err) {
+      console.error(`[NATSClient deleteStream err on ${err.message}]`);
+      throw err;
+    }
+  }
+
+  async addConsumer(stream, subject, consumer) {
+    try {
+      return this.jsm.consumers.add(stream, {
+        durable_name: consumer,
+        ack_policy: AckPolicy.Explicit,
+        filter_subject: subject,
+      });
+    } catch (err) {
+      console.error(`[NATSClient addConsumer err on ${err.message}]`);
+      throw err;
+    }
+  }
+
+  async deleteConsumer(stream, consumer) {
+    try {
+      return this.jsm.consumers.delete(stream, consumer);
+    } catch (err) {
+      console.error(`[NATSClient deleteConsumer err on ${err.message}]`);
+      throw err;
+    }
+  }
+
+  async publish(subject, obj) {
+    try {
+      const pa = await this.js.publish(subject, this.sc.encode(JSON.stringify(obj)));
       return pa;
     } catch (err) {
       console.log(`[NATSClient publish err on ${err.message}]`);
@@ -74,11 +133,9 @@ class NATSClient {
     }
   }
 
-  async subscribe(stream, subject, callback) {
+  async subscribe(stream, subject, consumerName, callback) {
     try {
-      const ss = `${stream}.${subject}`;
-
-      if (this.subs[ss]) {
+      if (this.subs[subject]) {
         throw new Error('the subject of the stream is existed');
       }
 
@@ -87,17 +144,21 @@ class NATSClient {
       }
 
       const opts = consumerOpts();
-      opts.durable('NATSClient_Durable');
       opts.manualAck();
       opts.ackExplicit();
-      opts.deliverTo(createInbox());
+      opts.filterSubject(subject);
 
-      const sub = await this.js.subscribe(ss, opts);
-      this.subs[ss] = sub;
+      if (consumerName) {
+        opts.durable(consumerName);
+        opts.bind(stream);
+      }
+
+      const sub = await this.js.pullSubscribe(subject, opts);
+      this.subs[subject] = sub;
 
       const done = (async () => {
         for await (const m of sub) {
-          callback(JSON.parse(this.sc.decode(m.data)));
+          callback(this.sc.decode(m.data));
 
           m.ack();
         }
@@ -108,16 +169,14 @@ class NATSClient {
     }
   }
 
-  async unsubscribe(stream, subject) {
+  async unsubscribe(subject) {
     try {
-      const ss = `${stream}.${subject}`;
-
-      if (!this.subs[ss]) {
+      if (!this.subs[subject]) {
         throw new Error('the subject of the stream is not existed');
       }
 
-      await this.subs[ss].unsubscribe();
-      await this.subs[ss].destroy();
+      await this.subs[subject].unsubscribe();
+      await this.subs[subject].destroy();
 
       delete this.subs[ss];
     } catch (err) {

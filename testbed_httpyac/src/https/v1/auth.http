@@ -1,0 +1,4 @@
+# @name getAccessToken
+POST {{APP_HOST}}/api/v1/auth HTTP/1.1
+
+< ./auth.post.payload.json

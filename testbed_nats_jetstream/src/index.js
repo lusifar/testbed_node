@@ -32,6 +32,7 @@ const main = async () => {
     console.log(pa);
 
     const opts = consumerOpts();
+    opts.queue("q");
     opts.durable('me');
     opts.manualAck();
     opts.ackExplicit();

@@ -14,7 +14,7 @@ const TestService = require('./services/testService');
 const run = async () => {
   try {
     const testService = new TestService();
-    testService.process();
+    await testService.process();
   } catch (err) {
     console.log(err.message);
   }

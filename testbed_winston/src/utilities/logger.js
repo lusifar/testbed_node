@@ -2,10 +2,11 @@ const moment = require('moment');
 const uuidv4 = require('uuid').v4;
 const NodeCache = require('node-cache');
 const { createLogger, format, transports } = require('winston');
+const { ElasticsearchTransport } = require('winston-elasticsearch');
 const { timestamp, printf, combine, splat, label } = format;
 
 const customFormat = printf(({ timestamp, label, message, level, ...metadata }) => {
-  return `[${label}] ${timestamp} ${level} ${message} ${JSON.stringify(metadata)}`;
+  return `[${label}] | ${timestamp} | ${level} | ${message} | ${JSON.stringify(metadata)}`;
 });
 
 const logger = createLogger({
@@ -19,7 +20,15 @@ const logger = createLogger({
     splat(),
     customFormat
   ),
-  transports: [new transports.Console({ level: 'debug' })],
+  transports: [
+    new transports.Console({ level: 'debug' }),
+    new ElasticsearchTransport({
+      level: 'debug',
+      clientOpts: {
+        node: 'http://localhost:9200',
+      },
+    }),
+  ],
 });
 
 logger.cache = new NodeCache();
@@ -34,7 +43,7 @@ const getDelHandleData = (handle) => {
   return cacheData;
 };
 
-logger.begin = (metadata, message = '') => {
+logger.begin = (metadata, message = '_logger_begin') => {
   const handle = uuidv4();
   logger.cache.set(handle, {
     ts: moment(),
@@ -46,7 +55,7 @@ logger.begin = (metadata, message = '') => {
   return handle;
 };
 
-logger.end = (handle, message = '') => {
+logger.end = (handle, message = '_logger_end') => {
   const cacheData = getDelHandleData(handle);
   if (!cacheData) return;
 
@@ -54,7 +63,7 @@ logger.end = (handle, message = '') => {
   logger.info(message, { _status: 'end', _duration: duration, ...cacheData.metadata });
 };
 
-logger.fail = (handle, message = '') => {
+logger.fail = (handle, message = '_logger_fail') => {
   const cacheData = getDelHandleData(handle);
   if (!cacheData) return;
 
