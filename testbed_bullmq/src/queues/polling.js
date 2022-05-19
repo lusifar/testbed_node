@@ -1,13 +1,13 @@
 const { Queue } = require('bullmq');
 
+const RedisClient = require('../utilities/redisClient');
+
 const { QUEUE, REDIS } = require('../constants');
 
+const redisClient = RedisClient.instance(REDIS.HOST, REDIS.PORT);
+
 module.exports = new Queue(QUEUE.POLLING, {
-  connection: {
-    host: REDIS.HOST,
-    port: REDIS.PORT,
-    maxRetriesPerRequest: null,
-  },
+  connection: redisClient.connection,
   defaultJobOptions: {
     removeOnComplete: true,
   },

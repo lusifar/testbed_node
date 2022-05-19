@@ -4,8 +4,11 @@ const { Worker } = require('bullmq');
 const pollingQueue = require('../queues/polling');
 
 const { removeRepeatableJob } = require('../utilities/queueUtil');
+const RedisClient = require('../utilities/redisClient');
 
 const { QUEUE, REDIS, JOB_STATUS, POLLING_STATUS } = require('../constants');
+
+const redisClient = RedisClient.instance(REDIS.HOST, REDIS.PORT);
 
 const worker = new Worker(
   QUEUE.POLLING,
@@ -29,7 +32,7 @@ const worker = new Worker(
     }
   },
   {
-    connection: { host: REDIS.HOST, port: REDIS.PORT, maxRetriesPerRequest: null },
+    connection: redisClient.connection,
     // autorun: false,
   }
 );
