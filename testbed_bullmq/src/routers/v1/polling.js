@@ -1,3 +1,4 @@
+const uuidv4 = require('uuid').v4;
 const express = require('express');
 
 const router = express.Router();
@@ -36,9 +37,10 @@ router.get('/api/v1/queue/polling', async (req, res) => {
 
 router.post('/api/v1/queue/polling', async (req, res) => {
   try {
-    const { endpoint, headers, payload, jobId, delay, limit } = req.body;
+    const { endpoint, headers, payload, delay, limit } = req.body;
 
     // generate the repeat options
+    const jobId = uuidv4();
     const repeatOpts = genRepeatOptions(jobId, delay, limit);
 
     // add the job as repeatable style
@@ -53,17 +55,9 @@ router.post('/api/v1/queue/polling', async (req, res) => {
       repeatOpts
     );
 
-    // return the data as the created repeatable job
-    const repeatableJobs = await pollingQueue.getRepeatableJobs();
-    const data = repeatableJobs.find((job) => {
-      if (job.id === jobId) {
-        return true;
-      }
-    });
-
     return res.status(200).send({
       ok: true,
-      data,
+      data: jobId,
     });
   } catch (err) {
     console.error(err.message);

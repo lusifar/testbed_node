@@ -32,6 +32,7 @@ const worker = new Worker(
     }
   },
   {
+    prefix: QUEUE.POLLING,
     connection: redisClient.connection,
     // autorun: false,
   }
