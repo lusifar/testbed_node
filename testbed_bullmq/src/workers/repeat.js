@@ -25,7 +25,7 @@ const worker = new Worker(
 
       return {
         jobId,
-        status: data.data,
+        data: data.data,
       };
     } catch (err) {
       throw err;
@@ -41,9 +41,9 @@ const worker = new Worker(
 worker.on(JOB_STATUS.COMPLETED, async (job, returnvalue) => {
   console.log(`job: ${job.id} is completed with returned value: ${JSON.stringify(returnvalue)}`);
 
-  const { jobId, status } = returnvalue;
+  const { jobId, data } = returnvalue;
 
-  if (status === POLLING_STATUS.SUCCESS) {
+  if (data.status === POLLING_STATUS.SUCCESS) {
     // remove the repeatable job
     await removeRepeatableJob(repeatQueue, jobId);
   }
