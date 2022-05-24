@@ -7,7 +7,9 @@ module.exports = {
     PORT: 6379,
   },
   QUEUE: {
+    REPEAT: 'REPEAT',
     POLLING: 'POLLING',
+    COMMON: 'COMMON',
   },
   JOB_STATUS: {
     COMPLETED: 'completed',

@@ -10,10 +10,9 @@ router.post('/api/v1/job/process', async (req, res) => {
 
     const factor = Math.floor(Math.random() * 100);
 
-    let ok = true;
-    let data = POLLING_STATUS.PROCESSING;
+    let data = { status: POLLING_STATUS.PROCESSING };
     if (factor > 70) {
-      data = POLLING_STATUS.SUCCESS;
+      data.status = POLLING_STATUS.SUCCESS;
     } else if (factor < 20) {
       throw new Error('something is wrong');
     }
@@ -27,7 +26,9 @@ router.post('/api/v1/job/process', async (req, res) => {
 
     return res.status(500).send({
       ok: false,
-      data: POLLING_STATUS.FAULTED,
+      data: {
+        status: POLLING_STATUS.FAULTED,
+      },
       message: err.message,
     });
   }

@@ -5,6 +5,20 @@ const genRepeatOptions = (jobId, delay, limit = null) => {
   };
 };
 
+const getJob = async (queue, jobId) => {
+  const job = await queue.getJob(jobId);
+  return job;
+};
+
+const removeJob = async (queue, jobId) => {
+  const res = await queue.remove(jobId);
+
+  if (res > 0) {
+    return true;
+  }
+  return false;
+};
+
 const getRepeatableJob = async (queue, jobId) => {
   const jobs = await queue.getRepeatableJobs();
 
@@ -38,6 +52,8 @@ const removeRepeatableJob = async (queue, jobId) => {
 
 module.exports = {
   genRepeatOptions,
+  getJob,
+  removeJob,
   getRepeatableJob,
   removeRepeatableJob,
 };

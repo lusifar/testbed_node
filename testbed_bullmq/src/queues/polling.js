@@ -7,7 +7,7 @@ const { QUEUE, REDIS } = require('../constants');
 const redisClient = RedisClient.instance(REDIS.HOST, REDIS.PORT);
 
 module.exports = new Queue(QUEUE.POLLING, {
-  prefix: QUEUE.POLLING,
+  prefix: `{${QUEUE.POLLING}}`,
   connection: redisClient.connection,
   defaultJobOptions: {
     removeOnComplete: true,

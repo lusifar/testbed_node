@@ -1,7 +1,7 @@
 const axios = require('axios');
 const { Worker } = require('bullmq');
 
-const pollingQueue = require('../queues/polling');
+const repeatQueue = require('../queues/repeat');
 
 const { removeRepeatableJob } = require('../utilities/queueUtil');
 const RedisClient = require('../utilities/redisClient');
@@ -11,46 +11,28 @@ const { QUEUE, REDIS, JOB_STATUS, POLLING_STATUS } = require('../constants');
 const redisClient = RedisClient.instance(REDIS.HOST, REDIS.PORT);
 
 const worker = new Worker(
-  QUEUE.POLLING,
+  QUEUE.REPEAT,
   async (job) => {
     try {
-      const { endpoint, payload, headers, jobId, delay } = job.data;
-
-      if (!endpoint || !payload || !jobId || !delay) {
+      const { endpoint, payload, headers, jobId } = job.data;
+      if (!endpoint || !payload || !jobId) {
         throw Error('the required parameters are not existed');
       }
 
-      const res = await new Promise((resolve, reject) => {
-        const handler = setInterval(async () => {
-          try {
-            const { data } = await axios.post(endpoint, payload, {
-              ...(headers ? { headers } : {}),
-            });
-
-            if (data.data.status === POLLING_STATUS.SUCCESS) {
-              clearInterval(handler);
-
-              resolve({
-                jobId,
-              });
-            } else if (data.data.status === POLLING_STATUS.FAULTED) {
-              clearInterval(handler);
-
-              reject(new Error(data.message));
-            }
-          } catch (err) {
-            reject(err);
-          }
-        }, delay);
+      const { data } = await axios.post(endpoint, payload, {
+        ...(headers ? { headers } : {}),
       });
 
-      return res;
+      return {
+        jobId,
+        status: data.data,
+      };
     } catch (err) {
       throw err;
     }
   },
   {
-    prefix: `{${QUEUE.POLLING}}`,
+    prefix: `{${QUEUE.REPEAT}}`,
     connection: redisClient.connection,
     // autorun: false,
   }
@@ -58,6 +40,13 @@ const worker = new Worker(
 
 worker.on(JOB_STATUS.COMPLETED, async (job, returnvalue) => {
   console.log(`job: ${job.id} is completed with returned value: ${JSON.stringify(returnvalue)}`);
+
+  const { jobId, status } = returnvalue;
+
+  if (status === POLLING_STATUS.SUCCESS) {
+    // remove the repeatable job
+    await removeRepeatableJob(repeatQueue, jobId);
+  }
 });
 
 worker.on(JOB_STATUS.PROGRESS, (job, progress) => {

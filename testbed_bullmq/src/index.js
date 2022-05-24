@@ -1,6 +1,13 @@
+const { FlowProducer } = require('bullmq');
+
+const repeatQueue = require('./queues/repeat');
 const pollingQueue = require('./queues/polling');
+const commonQueue = require('./queues/common');
 const schedulerQueue = require('./queues/scheduler');
+
+const repeatWorker = require('./workers/repeat');
 const pollingWorker = require('./workers/polling');
+const commonWorker = require('./workers/common');
 
 const { APP } = require('./constants');
 
@@ -10,7 +17,34 @@ const run = async () => {
   app.listen(APP.PORT, async () => {
     console.log(`the app is running on port: ${APP.PORT}`);
 
-    // pollingWorker.run();
+    // const flowProducer = new FlowProducer();
+
+    // const flow = await flowProducer.add({
+    //   name: 'dmon_pa',
+    //   queueName: QUEUE.COMMON,
+    //   data: {
+    //     endpoint: 'http://127.0.0.1:3030/api/v1/job/process',
+    //     payload: {
+    //       test: 'test',
+    //     },
+    //   },
+    //   prefix: `{${QUEUE.COMMON}}`,
+    //   opts: 'repeat',
+    //   children: [
+    //     {
+    //       name: 'dmon_pa',
+    //       queueName: QUEUE.COMMON,
+    //       data: {
+    //         endpoint: 'http://127.0.0.1:3030/api/v1/job/process',
+    //         payload: {
+    //           test: 'test',
+    //         },
+    //         jobId: '12345',
+    //       },
+    //       prefix: `{${QUEUE.COMMON}}`,
+    //     },
+    //   ],
+    // });
   });
 };
 

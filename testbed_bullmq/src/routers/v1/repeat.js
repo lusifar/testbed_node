@@ -3,18 +3,22 @@ const express = require('express');
 
 const router = express.Router();
 
-const pollingQueue = require('../../queues/polling');
+const repeatQueue = require('../../queues/repeat');
 
-router.get('/api/v1/queue/polling', async (req, res) => {
+const { genRepeatOptions, getRepeatableJob } = require('../../utilities/queueUtil');
+
+const { QUEUE } = require('../../constants');
+
+router.get('/api/v1/queue/repeat', async (req, res) => {
   try {
     const { jobId } = req.query;
 
     // get the data by returning all jobs or getting the specific job
     let data = null;
     if (jobId) {
-      data = await pollingQueue.getJob(jobId);
+      data = await getRepeatableJob(repeatQueue, jobId);
     } else {
-      data = await pollingQueue.getJobs();
+      data = await repeatQueue.getRepeatableJobs();
     }
 
     return res.status(200).send({
@@ -31,8 +35,8 @@ router.get('/api/v1/queue/polling', async (req, res) => {
   }
 });
 
-router.post('/api/v1/queue/polling', async (req, res) => {
-  const { name, endpoint, headers, payload, delay } = req.body;
+router.post('/api/v1/queue/repeat', async (req, res) => {
+  const { name, endpoint, headers, payload, delay, limit } = req.body;
   try {
     if (!name || !endpoint || !payload || !delay) {
       throw new Error('the required parameters are not existed');
@@ -40,18 +44,18 @@ router.post('/api/v1/queue/polling', async (req, res) => {
 
     // generate the repeat options
     const jobId = uuidv4();
+    const repeatOpts = genRepeatOptions(jobId, delay, limit);
 
     // add the job as repeatable style
-    await pollingQueue.add(
+    await repeatQueue.add(
       name,
       {
         endpoint,
         headers,
         payload,
         jobId,
-        delay,
       },
-      { jobId }
+      repeatOpts
     );
 
     return res.status(200).send({
