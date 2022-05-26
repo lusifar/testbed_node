@@ -17,7 +17,7 @@ const run = async () => {
   app.listen(APP.PORT, async () => {
     console.log(`the app is running on port: ${APP.PORT}`);
 
-    // const flowProducer = new FlowProducer();
+    global.flowProducer = new FlowProducer();
 
     // const flow = await flowProducer.add({
     //   name: 'dmon_pa',
@@ -33,15 +33,17 @@ const run = async () => {
     //   children: [
     //     {
     //       name: 'dmon_pa',
-    //       queueName: QUEUE.COMMON,
+    //       queueName: QUEUE.POLLING,
     //       data: {
     //         endpoint: 'http://127.0.0.1:3030/api/v1/job/process',
     //         payload: {
     //           test: 'test',
     //         },
     //         jobId: '12345',
+    //         delay: 1000,
+    //         // limit: 2,
     //       },
-    //       prefix: `{${QUEUE.COMMON}}`,
+    //       prefix: `{${QUEUE.POLLING}}`,
     //     },
     //   ],
     // });
@@ -63,15 +65,6 @@ const run = async () => {
   'SIGTERM',
 ].forEach((sig) => {
   process.on(sig, async () => {
-    // const repeatableJobs = await pollingQueue.getRepeatableJobs();
-    // for (let job of repeatableJobs) {
-    //   await pollingQueue.removeRepeatableByKey(job.key);
-    // }
-    // await pollingQueue.drain();
-    // await pollingQueue.close();
-
-    // await schedulerQueue.close();
-
     process.exit(1);
   });
 });

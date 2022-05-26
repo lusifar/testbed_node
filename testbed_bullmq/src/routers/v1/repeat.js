@@ -7,8 +7,6 @@ const repeatQueue = require('../../queues/repeat');
 
 const { genRepeatOptions, getRepeatableJob } = require('../../utilities/queueUtil');
 
-const { QUEUE } = require('../../constants');
-
 router.get('/api/v1/queue/repeat', async (req, res) => {
   try {
     const { jobId } = req.query;

@@ -5,20 +5,6 @@ const genRepeatOptions = (jobId, delay, limit = null) => {
   };
 };
 
-const getJob = async (queue, jobId) => {
-  const job = await queue.getJob(jobId);
-  return job;
-};
-
-const removeJob = async (queue, jobId) => {
-  const res = await queue.remove(jobId);
-
-  if (res > 0) {
-    return true;
-  }
-  return false;
-};
-
 const getRepeatableJob = async (queue, jobId) => {
   const jobs = await queue.getRepeatableJobs();
 
@@ -50,10 +36,47 @@ const removeRepeatableJob = async (queue, jobId) => {
   }
 };
 
+const converToFlowJob = (workflow) => {
+  try {
+    if (workflow.length === 0) {
+      throw new Error('the workflow is empty');
+    }
+
+    // reverse the workflow first to let first one as last child
+    workflow.reverse();
+
+    let parentJob = null;
+    let currentJob = null;
+    let lastJob = null;
+    workflow.forEach((worker) => {
+      currentJob = {
+        name: worker.name,
+        queueName: worker.queueName,
+        data: worker.data,
+        prefix: `{${worker.queueName}}`,
+        children: [],
+      };
+
+      if (!parentJob) {
+        parentJob = currentJob;
+        lastJob = currentJob;
+      } else {
+        lastJob.children.push(currentJob);
+        lastJob = currentJob;
+      }
+    });
+
+    return parentJob;
+  } catch (err) {
+    console.error(err.message);
+
+    throw err;
+  }
+};
+
 module.exports = {
   genRepeatOptions,
-  getJob,
-  removeJob,
   getRepeatableJob,
   removeRepeatableJob,
+  converToFlowJob,
 };

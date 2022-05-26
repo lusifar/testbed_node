@@ -1,0 +1,20 @@
+{
+  "name": "testbed_redlock",
+  "version": "1.0.0",
+  "description": "the testbed for testing redis lock",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "nodejs",
+    "redis",
+    "redlock"
+  ],
+  "author": "lusifar",
+  "license": "ISC",
+  "dependencies": {
+    "ioredis": "^5.0.5",
+    "redlock": "^5.0.0-beta.2"
+  }
+}
