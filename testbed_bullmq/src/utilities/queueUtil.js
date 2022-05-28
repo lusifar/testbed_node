@@ -1,3 +1,5 @@
+const { QUEUE } = require('../constants');
+
 const genRepeatOptions = (jobId, delay, limit = null) => {
   return {
     repeat: { every: +delay, ...(limit ? { limit } : {}) },
@@ -72,12 +74,12 @@ const converToFlowJob = (workflow) => {
     let parentJob = null;
     let currentJob = null;
     let lastJob = null;
-    workflow.forEach((worker, index) => {
+    workflow.forEach((worker) => {
       currentJob = {
         name: worker.name,
-        queueName: worker.queueName,
+        queueName: QUEUE.COMMON,
         data: worker.data,
-        prefix: `{${worker.queueName}}`,
+        prefix: `{${QUEUE.COMMON}}`,
         children: [],
       };
 

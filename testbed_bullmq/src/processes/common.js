@@ -17,14 +17,20 @@ module.exports = async (job) => {
 
     console.log(`[COMMON_PROCESS] ${job.id}, ${JSON.stringify(data)}`);
 
-    if (data.data.status === COMMON_STATUS.SUCCESS) {
-      return { id: job.id, status: data.data.status };
-    } else if (data.data.status === COMMON_STATUS.FAULTED) {
-      throw new Error('common process has something wrong');
-    } else if (data.data.status === COMMON_STATUS.PROCESSING) {
-      await commonQueue.add(job.name, job.data, { ...job.opts, delay: 2000 });
+    const { mq } = data.data;
 
-      return { id: job.id, status: data.data.status };
+    if (mq.status === COMMON_STATUS.SUCCESS) {
+      return { status: mq.status };
+    } else if (mq.status === COMMON_STATUS.FAULTED) {
+      throw new Error('common process response faulted result');
+    } else if (mq.status === COMMON_STATUS.PROCESSING) {
+      const newJob = await commonQueue.add(job.name, job.data, {
+        ...job.opts,
+        ...(mq.jobId ? { jobId: mq.jobId } : {}),
+        ...(mq.delay ? { delay: mq.delay } : { delay: 60 * 1000 }),
+      });
+
+      return { jobId: newJob.id, status: mq.status };
     }
   } catch (err) {
     throw err;
