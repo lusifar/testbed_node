@@ -3,16 +3,15 @@ const { Worker } = require('bullmq');
 
 const RedisClient = require('../utilities/redisClient');
 
-const pollingProcess = require('../processes/polling');
-
 const { REDIS, JOB_STATUS } = require('../constants');
 
 const redisClient = RedisClient.instance(REDIS.HOST, REDIS.PORT);
 
-module.exports = (queueName) => {
-  const worker = new Worker(queueName, pollingProcess, {
+module.exports = (queueName, process) => {
+  const worker = new Worker(queueName, process, {
     prefix: `{${queueName}}`,
     connection: redisClient.connection,
+    concurrency: 100,
     // autorun: false,
   });
 

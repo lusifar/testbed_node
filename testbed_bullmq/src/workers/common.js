@@ -5,7 +5,7 @@ const commonQueue = require('../queues/common');
 
 const RedisClient = require('../utilities/redisClient');
 
-const { QUEUE, REDIS, JOB_STATUS, POLLING_STATUS } = require('../constants');
+const { QUEUE, REDIS, JOB_STATUS } = require('../constants');
 
 const redisClient = RedisClient.instance(REDIS.HOST, REDIS.PORT);
 
@@ -14,7 +14,7 @@ const commonProcess = require('../processes/common');
 const worker = new Worker(QUEUE.COMMON, commonProcess, {
   prefix: `{${QUEUE.COMMON}}`,
   connection: redisClient.connection,
-  concurrency: 10,
+  concurrency: 100,
   // autorun: false,
 });
 

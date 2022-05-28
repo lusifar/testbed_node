@@ -1,6 +1,6 @@
 const express = require('express');
 
-const { POLLING_STATUS } = require('../../constants');
+const { COMMON_STATUS } = require('../../constants');
 
 const router = express.Router();
 
@@ -10,9 +10,9 @@ router.post('/api/v1/job/process', async (req, res) => {
 
     const factor = Math.floor(Math.random() * 100);
 
-    let data = { status: POLLING_STATUS.PROCESSING };
+    let data = { status: COMMON_STATUS.PROCESSING };
     if (factor > 70) {
-      data.status = POLLING_STATUS.SUCCESS;
+      data.status = COMMON_STATUS.SUCCESS;
     } else if (factor < 20) {
       throw new Error('something is wrong');
     }
@@ -25,7 +25,7 @@ router.post('/api/v1/job/process', async (req, res) => {
     return res.status(500).send({
       ok: false,
       data: {
-        status: POLLING_STATUS.FAULTED,
+        status: COMMON_STATUS.FAULTED,
       },
       message: err.message,
     });

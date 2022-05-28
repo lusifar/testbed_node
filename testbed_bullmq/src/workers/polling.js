@@ -12,7 +12,7 @@ const redisClient = RedisClient.instance(REDIS.HOST, REDIS.PORT);
 const worker = new Worker(QUEUE.POLLING, pollingProcess, {
   prefix: `{${QUEUE.POLLING}}`,
   connection: redisClient.connection,
-  concurrency: 10,
+  concurrency: 100,
   // autorun: false,
 });
 

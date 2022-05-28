@@ -5,49 +5,27 @@ const RedisClient = require('./utilities/redisClient');
 const repeatQueue = require('./queues/repeat');
 const pollingQueue = require('./queues/polling');
 const commonQueue = require('./queues/common');
-const schedulerQueue = require('./queues/scheduler');
+const schedulerRepeatQueue = require('./queues/schedulerRepeat');
+const schedulerRepeatCommon = require('./queues/schedulerCommon');
 
 const repeatWorker = require('./workers/repeat');
 const pollingWorker = require('./workers/polling');
 const commonWorker = require('./workers/common');
+const factoryWorker = require('./workers/factory');
 
-const { APP, REDIS } = require('./constants');
+const pollingProcess = require('./processes/polling');
+
+const { APP, REDIS, QUEUE } = require('./constants');
+
+const { removeAllJobs } = require('./utilities/queueUtil');
 
 const app = require('./app');
 
 const run = async () => {
   app.listen(APP.PORT, async () => {
-    console.log(`the app is running on port: ${APP.PORT}`);
+    console.log(`the app is running on port: ,${APP.PORT}`);
 
     global.flowProducer = new FlowProducer();
-
-    // const flow = await flowProducer.add({
-    //   name: 'dmon_pa',
-    //   queueName: QUEUE.COMMON,
-    //   data: {
-    //     endpoint: 'http://127.0.0.1:3030/api/v1/job/process',
-    //     payload: {
-    //       test: 'test',
-    //     },
-    //   },
-    //   prefix: `{${QUEUE.COMMON}}`,
-    //   children: [
-    //     {
-    //       name: 'dmon_pa',
-    //       queueName: QUEUE.POLLING,
-    //       data: {
-    //         endpoint: 'http://127.0.0.1:3030/api/v1/job/process',
-    //         payload: {
-    //           test: 'test',
-    //         },
-    //         jobId: '12345',
-    //         delay: 1000,
-    //         // limit: 2,
-    //       },
-    //       prefix: `{${QUEUE.POLLING}}`,
-    //     },
-    //   ],
-    // });
   });
 };
 
