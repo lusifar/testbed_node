@@ -38,25 +38,17 @@ router.post('/api/v1/queue/polling', async (req, res) => {
       throw new Error('the required parameters are not existed');
     }
 
-    // generate the repeat options
-    const jobId = uuidv4();
-
     // add the job as repeatable style
-    await pollingQueue.add(
-      name,
-      {
-        endpoint,
-        headers,
-        payload,
-        jobId,
-        delay,
-      },
-      { jobId }
-    );
+    const job = await pollingQueue.add(name, {
+      endpoint,
+      headers,
+      payload,
+      delay,
+    });
 
     return res.status(200).send({
       ok: true,
-      data: jobId,
+      data: job,
     });
   } catch (err) {
     console.error(err.message);

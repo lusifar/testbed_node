@@ -22,4 +22,9 @@ module.exports = {
     PROCESSING: 'PROCESSING',
     FAULTED: 'FAULTED',
   },
+  COMMON_STATUS: {
+    SUCCESS: 'SUCCESS',
+    PROCESSING: 'PROCESSING',
+    FAULTED: 'FAULTED',
+  },
 };

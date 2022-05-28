@@ -18,6 +18,30 @@ const getRepeatableJob = async (queue, jobId) => {
   return job;
 };
 
+const removeAllJobs = async (queue, filter = null) => {
+  try {
+    const jobs = await queue.getJobs();
+
+    for (let job of jobs) {
+      if (filter && filter.length > 0) {
+        const state = await job.getState();
+
+        console.log(state);
+
+        if (filter.includes(state)) {
+          await queue.remove(job.id);
+        }
+      } else {
+        await queue.remove(job.id);
+      }
+    }
+  } catch (err) {
+    console.error(err.message);
+
+    throw err;
+  }
+};
+
 const removeRepeatableJob = async (queue, jobId) => {
   try {
     // remove the repeatable job by jobId
@@ -48,7 +72,7 @@ const converToFlowJob = (workflow) => {
     let parentJob = null;
     let currentJob = null;
     let lastJob = null;
-    workflow.forEach((worker) => {
+    workflow.forEach((worker, index) => {
       currentJob = {
         name: worker.name,
         queueName: worker.queueName,
@@ -77,6 +101,7 @@ const converToFlowJob = (workflow) => {
 module.exports = {
   genRepeatOptions,
   getRepeatableJob,
+  removeAllJobs,
   removeRepeatableJob,
   converToFlowJob,
 };
