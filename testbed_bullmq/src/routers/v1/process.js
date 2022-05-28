@@ -22,8 +22,6 @@ router.post('/api/v1/job/process', async (req, res) => {
       data,
     });
   } catch (err) {
-    console.error(err.message);
-
     return res.status(500).send({
       ok: false,
       data: {

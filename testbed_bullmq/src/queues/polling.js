@@ -11,5 +11,6 @@ module.exports = new Queue(QUEUE.POLLING, {
   connection: redisClient.connection,
   defaultJobOptions: {
     removeOnComplete: true,
+    removeOnFail: true,
   },
 });

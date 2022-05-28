@@ -11,5 +11,6 @@ module.exports = new Queue(QUEUE.REPEAT, {
   connection: redisClient.connection,
   defaultJobOptions: {
     removeOnComplete: true,
+    removeOnFail: true,
   },
 });

@@ -39,7 +39,7 @@ const worker = new Worker(
 );
 
 worker.on(JOB_STATUS.COMPLETED, async (job, returnvalue) => {
-  console.log(`job: ${job.id} is completed with returned value: ${JSON.stringify(returnvalue)}`);
+  console.log(`[REPEAT_WORKER] job: ${job.id} is completed with returned value: ${JSON.stringify(returnvalue)}`);
 
   const { jobId, data } = returnvalue;
 
@@ -50,15 +50,15 @@ worker.on(JOB_STATUS.COMPLETED, async (job, returnvalue) => {
 });
 
 worker.on(JOB_STATUS.PROGRESS, (job, progress) => {
-  console.log(`job: ${job.id} is porgressing with progress number: ${progress}`);
+  console.log(`[REPEAT_WORKER] job: ${job.id} is porgressing with progress number: ${progress}`);
 });
 
 worker.on(JOB_STATUS.FAILED, (job, err) => {
-  console.error(`job: ${job.id} is failed with error: ${err.message}`);
+  console.error(`[REPEAT_WORKER] job: ${job.id} is failed with error: ${err.message}`);
 });
 
 worker.on(JOB_STATUS.ERROR, (err) => {
-  console.error(err.message);
+  console.error(`[REPEAT_WORKER] ${err.message}`);
 });
 
 module.exports = worker;

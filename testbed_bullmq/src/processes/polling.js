@@ -14,11 +14,18 @@ module.exports = async (job) => {
     const res = await new Promise((resolve, reject) => {
       const handler = setInterval(async () => {
         try {
+          //   // trick to remove the interval in illegal state
+          //   const state = await job.getState();
+          //   if (state !== 'active') {
+          //     clearInterval(handler);
+          //     return;
+          //   }
+
           const { data } = await axios.post(endpoint, payload, {
             ...(headers ? { headers } : {}),
           });
 
-          console.log(job.id, data);
+          console.log(`[POLLING_PROCESS] ${job.id}, ${JSON.stringify(data)}`);
 
           if (data.data.status === POLLING_STATUS.SUCCESS) {
             clearInterval(handler);
@@ -27,9 +34,7 @@ module.exports = async (job) => {
               data: data.data,
             });
           } else if (data.data.status === POLLING_STATUS.FAULTED) {
-            clearInterval(handler);
-
-            reject(new Error(data.message));
+            throw new Error(data.message);
           }
 
           if (limit) {
@@ -45,6 +50,8 @@ module.exports = async (job) => {
             }
           }
         } catch (err) {
+          clearInterval(handler);
+
           reject(err);
         }
       }, delay);

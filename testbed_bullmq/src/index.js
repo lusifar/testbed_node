@@ -1,5 +1,7 @@
 const { FlowProducer } = require('bullmq');
 
+const RedisClient = require('./utilities/redisClient');
+
 const repeatQueue = require('./queues/repeat');
 const pollingQueue = require('./queues/polling');
 const commonQueue = require('./queues/common');
@@ -9,7 +11,7 @@ const repeatWorker = require('./workers/repeat');
 const pollingWorker = require('./workers/polling');
 const commonWorker = require('./workers/common');
 
-const { APP } = require('./constants');
+const { APP, REDIS } = require('./constants');
 
 const app = require('./app');
 
@@ -29,7 +31,6 @@ const run = async () => {
     //     },
     //   },
     //   prefix: `{${QUEUE.COMMON}}`,
-    //   opts: 'repeat',
     //   children: [
     //     {
     //       name: 'dmon_pa',
