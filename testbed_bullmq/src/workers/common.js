@@ -19,15 +19,17 @@ const worker = new Worker(QUEUE.COMMON, commonProcess, {
 });
 
 worker.on(JOB_STATUS.COMPLETED, async (job, returnvalue) => {
-  console.log(`[COMMOM_WORKER] job: ${job.id} is completed with returned value: ${JSON.stringify(returnvalue)}`);
+  console.log(
+    `[COMMOM_WORKER] job ${job.name}: ${job.id} is completed with returned value: ${JSON.stringify(returnvalue)}`
+  );
 });
 
 worker.on(JOB_STATUS.PROGRESS, (job, progress) => {
-  console.log(`[COMMOM_WORKER] job: ${job.id} is porgressing with progress number: ${progress}`);
+  console.log(`[COMMOM_WORKER] job ${job.name}: ${job.id} is porgressing with progress number: ${progress}`);
 });
 
 worker.on(JOB_STATUS.FAILED, (job, err) => {
-  console.error(`[COMMOM_WORKER] job: ${job.id} is failed with error: ${err.message}`);
+  console.error(`[COMMOM_WORKER] job ${job.name}: ${job.id} is failed with error: ${err.message}`);
 });
 
 worker.on(JOB_STATUS.ERROR, (err) => {

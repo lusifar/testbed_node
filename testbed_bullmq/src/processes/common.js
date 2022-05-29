@@ -1,4 +1,5 @@
 const axios = require('axios');
+const moment = require('moment');
 
 const commonQueue = require('../queues/common');
 
@@ -11,6 +12,20 @@ module.exports = async (job) => {
       throw Error('the required parameters are not existed');
     }
 
+    // get the latest one as the result from child
+    let childrenValues = await job.getChildrenValues();
+    childrenValues = Object.values(childrenValues);
+
+    let lastChildValue = childrenValues[0];
+    Object.values(childrenValues).forEach((child) => {
+      if (child.ts > lastChildValue.ts) {
+        lastChildValue = child;
+      }
+    });
+
+    console.log(childrenValues);
+    console.log(lastChildValue);
+
     const { data } = await axios.post(endpoint, payload, {
       ...(headers ? { headers } : {}),
     });
@@ -20,7 +35,7 @@ module.exports = async (job) => {
     const { mq } = data.data;
 
     if (mq.status === COMMON_STATUS.SUCCESS) {
-      return { status: mq.status };
+      return { ts: moment().unix(), data };
     } else if (mq.status === COMMON_STATUS.FAULTED) {
       throw new Error('common process response faulted result');
     } else if (mq.status === COMMON_STATUS.PROCESSING) {
@@ -30,7 +45,7 @@ module.exports = async (job) => {
         ...(mq.delay ? { delay: mq.delay } : { delay: 60 * 1000 }),
       });
 
-      return { jobId: newJob.id, status: mq.status };
+      return { ts: moment().unix(), jobId: newJob.id, data };
     }
   } catch (err) {
     throw err;

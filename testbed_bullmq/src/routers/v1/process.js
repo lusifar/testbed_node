@@ -14,8 +14,8 @@ router.post('/api/v1/job/process', async (req, res) => {
     let data = null;
     if (factor > 70) {
       data = { mq: { status: COMMON_STATUS.SUCCESS } };
-    } else if (factor < 20) {
-      throw new Error('something is wrong');
+      // } else if (factor < 20) {
+      //   throw new Error('something is wrong');
     } else {
       data = { mq: { status: COMMON_STATUS.PROCESSING, delay: 3000, jobId: uuidv4() } };
     }
