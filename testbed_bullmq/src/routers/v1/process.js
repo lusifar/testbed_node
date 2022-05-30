@@ -9,11 +9,13 @@ router.post('/api/v1/job/process', async (req, res) => {
   try {
     const payload = req.body;
 
+    console.log('/api/v1/job/process', payload);
+
     const factor = Math.floor(Math.random() * 100);
 
     let data = null;
     if (factor > 70) {
-      data = { mq: { status: COMMON_STATUS.SUCCESS } };
+      data = { output: { flowId: uuidv4() }, mq: { status: COMMON_STATUS.SUCCESS } };
       // } else if (factor < 20) {
       //   throw new Error('something is wrong');
     } else {

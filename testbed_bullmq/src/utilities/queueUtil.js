@@ -1,4 +1,4 @@
-const { QUEUE } = require('../constants');
+const { QUEUE, COMMON_STATUS } = require('../constants');
 
 const genRepeatOptions = (jobId, delay, limit = null) => {
   return {
@@ -100,10 +100,30 @@ const converToFlowJob = (workflow) => {
   }
 };
 
+const populatePayload = async (job, payload) => {
+  try {
+    // get the successful child output
+    let childOutput = {};
+    const childrenValues = await job.getChildrenValues();
+    Object.values(childrenValues).forEach((child) => {
+      if (child.status === COMMON_STATUS.SUCCESS && child.output) {
+        childOutput = child.output;
+      }
+    });
+
+    return { ...payload, ...childOutput };
+  } catch (err) {
+    console.error(err.message);
+
+    throw err;
+  }
+};
+
 module.exports = {
   genRepeatOptions,
   getRepeatableJob,
   removeAllJobs,
   removeRepeatableJob,
   converToFlowJob,
+  populatePayload,
 };
