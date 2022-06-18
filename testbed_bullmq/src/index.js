@@ -3,27 +3,21 @@ const { FlowProducer } = require('bullmq');
 const RedisClient = require('./utilities/redisClient');
 
 const repeatQueue = require('./queues/repeat');
-const pollingQueue = require('./queues/polling');
 const commonQueue = require('./queues/common');
 const schedulerRepeatQueue = require('./queues/schedulerRepeat');
 const schedulerRepeatCommon = require('./queues/schedulerCommon');
 
 const repeatWorker = require('./workers/repeat');
-const pollingWorker = require('./workers/polling');
 const commonWorker = require('./workers/common');
 const factoryWorker = require('./workers/factory');
 
-const pollingProcess = require('./processes/polling');
-
-const { APP, REDIS, QUEUE } = require('./constants');
-
-const { removeAllJobs } = require('./utilities/queueUtil');
+const { APP } = require('./constants');
 
 const app = require('./app');
 
 const run = async () => {
   app.listen(APP.PORT, async () => {
-    console.log(`the app is running on port: ,${APP.PORT}`);
+    console.log(`the app is running on port: ${APP.PORT}`);
 
     global.flowProducer = new FlowProducer();
   });

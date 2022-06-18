@@ -17,11 +17,6 @@ module.exports = {
     PROGRESS: 'progress',
     ERROR: 'error',
   },
-  POLLING_STATUS: {
-    SUCCESS: 'SUCCESS',
-    PROCESSING: 'PROCESSING',
-    FAULTED: 'FAULTED',
-  },
   COMMON_STATUS: {
     SUCCESS: 'SUCCESS',
     PROCESSING: 'PROCESSING',

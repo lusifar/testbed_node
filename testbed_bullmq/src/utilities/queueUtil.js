@@ -1,3 +1,5 @@
+const { QUEUE, COMMON_STATUS } = require('../constants');
+
 const genRepeatOptions = (jobId, delay, limit = null) => {
   return {
     repeat: { every: +delay, ...(limit ? { limit } : {}) },
@@ -72,12 +74,12 @@ const converToFlowJob = (workflow) => {
     let parentJob = null;
     let currentJob = null;
     let lastJob = null;
-    workflow.forEach((worker, index) => {
+    workflow.forEach((worker) => {
       currentJob = {
         name: worker.name,
-        queueName: worker.queueName,
+        queueName: QUEUE.COMMON,
         data: worker.data,
-        prefix: `{${worker.queueName}}`,
+        prefix: `{${QUEUE.COMMON}}`,
         children: [],
       };
 
@@ -98,10 +100,30 @@ const converToFlowJob = (workflow) => {
   }
 };
 
+const populatePayload = async (job, payload) => {
+  try {
+    // get the successful child output
+    let childOutput = {};
+    const childrenValues = await job.getChildrenValues();
+    Object.values(childrenValues).forEach((child) => {
+      if (child.status === COMMON_STATUS.SUCCESS && child.output) {
+        childOutput = child.output;
+      }
+    });
+
+    return { ...payload, ...childOutput };
+  } catch (err) {
+    console.error(err.message);
+
+    throw err;
+  }
+};
+
 module.exports = {
   genRepeatOptions,
   getRepeatableJob,
   removeAllJobs,
   removeRepeatableJob,
   converToFlowJob,
+  populatePayload,
 };

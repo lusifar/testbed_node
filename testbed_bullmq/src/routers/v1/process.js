@@ -1,3 +1,4 @@
+const uuidv4 = require('uuid').v4;
 const express = require('express');
 
 const { COMMON_STATUS } = require('../../constants');
@@ -8,13 +9,17 @@ router.post('/api/v1/job/process', async (req, res) => {
   try {
     const payload = req.body;
 
+    console.log('/api/v1/job/process', payload);
+
     const factor = Math.floor(Math.random() * 100);
 
-    let data = { status: COMMON_STATUS.PROCESSING };
+    let data = null;
     if (factor > 70) {
-      data.status = COMMON_STATUS.SUCCESS;
-    } else if (factor < 20) {
-      throw new Error('something is wrong');
+      data = { output: { flowId: uuidv4() }, mq: { status: COMMON_STATUS.SUCCESS } };
+      // } else if (factor < 20) {
+      //   throw new Error('something is wrong');
+    } else {
+      data = { mq: { status: COMMON_STATUS.PROCESSING, delay: 3000, jobId: uuidv4() } };
     }
 
     return res.status(200).send({
@@ -25,7 +30,9 @@ router.post('/api/v1/job/process', async (req, res) => {
     return res.status(500).send({
       ok: false,
       data: {
-        status: COMMON_STATUS.FAULTED,
+        mq: {
+          status: COMMON_STATUS.FAULTED,
+        },
       },
       message: err.message,
     });

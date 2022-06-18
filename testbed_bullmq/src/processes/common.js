@@ -1,6 +1,9 @@
 const axios = require('axios');
+const moment = require('moment');
 
 const commonQueue = require('../queues/common');
+
+const { populatePayload } = require('../utilities/queueUtil');
 
 const { COMMON_STATUS } = require('../constants');
 
@@ -11,20 +14,33 @@ module.exports = async (job) => {
       throw Error('the required parameters are not existed');
     }
 
-    const { data } = await axios.post(endpoint, payload, {
+    // get the successful child output
+    const newPayload = await populatePayload(job, payload);
+
+    const { data } = await axios.post(endpoint, newPayload, {
       ...(headers ? { headers } : {}),
     });
 
     console.log(`[COMMON_PROCESS] ${job.id}, ${JSON.stringify(data)}`);
 
-    if (data.data.status === COMMON_STATUS.SUCCESS) {
-      return { id: job.id, status: data.data.status };
-    } else if (data.data.status === COMMON_STATUS.FAULTED) {
-      throw new Error('common process has something wrong');
-    } else if (data.data.status === COMMON_STATUS.PROCESSING) {
-      await commonQueue.add(job.name, job.data, { ...job.opts, delay: 2000 });
+    const { output, mq } = data.data;
 
-      return { id: job.id, status: data.data.status };
+    if (mq.status === COMMON_STATUS.SUCCESS) {
+      return { jobId: job.id, status: COMMON_STATUS.SUCCESS, output };
+    } else if (mq.status === COMMON_STATUS.FAULTED) {
+      throw new Error('common process response faulted result');
+    } else if (mq.status === COMMON_STATUS.PROCESSING) {
+      const newJob = await commonQueue.add(
+        job.name,
+        { endpoint, payload: newPayload, headers },
+        {
+          ...job.opts,
+          ...(mq.jobId ? { jobId: mq.jobId } : {}),
+          ...(mq.delay ? { delay: mq.delay } : { delay: 60 * 1000 }),
+        }
+      );
+
+      return { jobId: newJob.id, status: COMMON_STATUS.PROCESSING };
     }
   } catch (err) {
     throw err;
